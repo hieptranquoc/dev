@@ -4,14 +4,6 @@ Basic Usage
 Vagrant
 -------
 
-0. ``vagrant up``
-
-   Use this command to create and provision a new VM, or start up an existing VM.
-
-0. ``vagrant up``
-
-   Use this command to create and provision a new VM, or start up an existing VM.
-
 1. ``vagrant up``
 
    Use this command to create and provision a new VM, or start up an existing VM.
