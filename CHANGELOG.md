@@ -1,6 +1,41 @@
 Change Log
 ==========
 
+
+[v0.6.0-a2][] (2018-08-26)
+--------------------------
+
+Bug fix for gitsynch tag
+
+
+Details: https://github.com/teracyhq/dev/milestone/9?closed=1
+
+
+[v0.6.0-a1][] (2018-08-25)
+--------------------------
+
+Completely new teracy-dev with initial alpha-1 version
+
+
+Details: https://github.com/teracyhq/dev/milestone/7?closed=1
+
+
+
+[v0.5.0-c2][] (2018-01-16)
+--------------------------
+
+new important critical features, bug fixes and improvements.
+
+- Bugs
+    + provide hot fix for docker-compose installation bug
+
+- New features
+    + select the right bridged network interface automatically
+
+
+Details: https://github.com/teracyhq/dev/milestone/8?closed=1
+
+
 [v0.5.0-c1][] (2017-07-27)
 --------------------------
 
@@ -292,4 +327,9 @@ Release the first milestone
 
 [v0.5.0-c1]: https://github.com/teracyhq/dev/milestone/5?closed=1
 
+[v0.5.0-c2]: https://github.com/teracyhq/dev/milestone/8?closed=1
+
 [support project base json config]: https://github.com/teracyhq/dev/issues/321
+
+[v0.6.0-a1]: https://github.com/teracyhq/dev/milestone/7?closed=1
+[v0.6.0-a2]: https://github.com/teracyhq/dev/milestone/9?closed=1
