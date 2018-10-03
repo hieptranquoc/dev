@@ -42,7 +42,6 @@ module TeracyDev
         settings
       end
 
-      private
 
       def build_teracy_dev_settings()
         config_file_path = File.join(File.dirname(__FILE__), '../../../config.yaml')
@@ -59,6 +58,7 @@ module TeracyDev
         settings
       end
 
+      private
 
       def build_extensions_settings(extensions)
         @logger.debug("extensions: #{extensions}")
@@ -67,7 +67,7 @@ module TeracyDev
           next if extension['enabled'] != true
           lookup_path = File.join(TeracyDev::BASE_DIR, extension['path']['lookup'] ||= DEFAULT_EXTESION_LOOKUP_PATH)
           path = File.join(lookup_path, extension['path']['extension'])
-          extensions_settings << Util.build_settings_from(File.join(path, 'config_default.yaml'))
+          extensions_settings << Util.load_yaml_file(File.join(path, 'config.yaml'))
         end
         settings = {}
         extensions_settings.reverse_each do |extension_settings|
