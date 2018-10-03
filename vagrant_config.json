@@ -23,7 +23,8 @@
         // "en0: Wi-Fi (AirPort)", // macOS 10.12
         // "en1: Wi-Fi (AirPort)", // macOS 10.11
         // "wlan0" // linux
-      ] // for public_network mode
+      ], // for public_network mode
+      "auto_bridge_default_network": true
     }],
     "synced_folders":[{ //see: http://docs.vagrantup.com/v2/synced-folders/index.html
       "_id": "0",
@@ -132,7 +133,7 @@
         // ]
       },
       "docker_compose": {
-        "release": "", // more: https://github.com/docker/compose/releases/
+        "version": "", // more: https://github.com/docker/compose/releases/
         "enabled": true // "docker" must be enabled to get this
       },
       "docker_machine": {
