@@ -6,10 +6,10 @@ module TeracyDev
     class Manager
 
       def self.manifest(extension)
-        lookup_path = File.join(TeracyDev::BASE_DIR, extension['path']['lookup'] || 'extensions')
+        lookup_path = File.join(TeracyDev::BASE_DIR, extension['path']['lookup'] || TeracyDev::DEFAULT_EXTENSION_LOOKUP_PATH)
         path = File.join(lookup_path, extension['path']['extension'])
         manifest_path = File.join(path, 'manifest.yaml')
-        return YAML.load(File.new(manifest_path))
+        return YAML.load_file(manifest_path)
       end
 
       def initialize
@@ -17,19 +17,36 @@ module TeracyDev
       end
 
       def install(extensions)
-        @logger.debug("install: #{extensions}")
+        @logger.debug("extensions: #{extensions}")
+        timer_start = Time.now
         extensions.each do |extension|
-          sync(extension)
-          validate(extension)
+          if Util.true?(extension['enabled'])
+            sync(extension)
+            validate(extension)
+          end
         end
+
+        extention_manifest_list = extensions.map { |x| Manager.manifest(x) if Util.true?(x['enabled'])}.compact
+        extensions.each do |extension|
+          validate_dependencies(extension, extention_manifest_list) if Util.true?(extension['enabled'])
+        end
+
+        timer_end = Time.now
+        @logger.debug("installation finished in #{timer_end - timer_start}s of extensions: #{extensions}")
       end
 
       private
 
       def sync(extension)
-        return if extension['enabled'] != true
+        return unless Util.true?(extension['enabled'])
+
+        if !Util.exist? extension['path']['extension']
+          @logger.error("#{extension} must have path.extension, please set path.extension then reload again.")
+          abort
+        end
+
         lookup_path = File.join(TeracyDev::BASE_DIR, extension['path']['lookup'] ||= DEFAULT_EXTENSION_LOOKUP_PATH)
-        path = File.join(lookup_path, extension['path']['extension'])
+        path = File.join(lookup_path, extension['path']['extension'].split('/')[0])
         extension['location'].merge!({
           "lookup_path" => lookup_path,
           "path" => path
@@ -39,7 +56,8 @@ module TeracyDev
       end
 
       def validate(extension)
-        return if extension['enabled'] != true
+        return unless Util.true?(extension['enabled'])
+
         manifest = Manager.manifest(extension)
 
         if !Util.exist?(manifest['name']) or !Util.exist?(manifest['version'])
@@ -61,6 +79,24 @@ module TeracyDev
         end
       end
 
+      def validate_dependencies(extension, extention_manifest_list)
+        extension_manifest = Manager.manifest(extension)
+        return unless Util.exist?(extension_manifest['dependencies'])
+
+        extension_manifest['dependencies'].each do |dependency|
+          found = extention_manifest_list.find { |x| x['name'] == dependency['name'] }
+          if found.nil?
+            @logger.error("the extension #{dependency['name']} is required by #{extension_manifest['name']} but could not be found.")
+            abort
+          else
+            if !Util.require_version_valid?(found['version'], dependency['require_version'])
+              @logger.error("the extension #{dependency['name']} #{dependency['require_version']} is required by "\
+              "#{extension_manifest['name']} but found version #{found['version']}")
+              abort
+            end
+          end
+        end
+      end
     end
   end
 end

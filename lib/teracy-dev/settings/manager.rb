@@ -64,16 +64,17 @@ module TeracyDev
         @logger.debug("extensions: #{extensions}")
         extensions_settings = []
         extensions.each do |extension|
-          next if extension['enabled'] != true
+          next unless Util.true?(extension['enabled'])
           lookup_path = File.join(TeracyDev::BASE_DIR, extension['path']['lookup'] ||= DEFAULT_EXTESION_LOOKUP_PATH)
           path = File.join(lookup_path, extension['path']['extension'])
           extensions_settings << Util.load_yaml_file(File.join(path, 'config.yaml'))
         end
         settings = {}
-        extensions_settings.reverse_each do |extension_settings|
-          settings = Util.override(extension_settings, settings)
+        extensions_settings.each do |extension_setting|
+          settings = Util.override(settings, extension_setting)
         end
-        @logger.debug("settings: #{settings}")
+
+        @logger.debug("final extensions settings: #{settings}")
         settings
       end
 

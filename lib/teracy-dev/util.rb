@@ -1,8 +1,10 @@
 require_relative 'logging'
+require 'yaml'
 
 module TeracyDev
   class Util
     @@logger = TeracyDev::Logging.logger_for(self)
+    @@deprecated_messages = []
 
     # check if a value exists (not nil and not empty if is a string)
     def self.exist?(value)
@@ -27,6 +29,44 @@ module TeracyDev
       raise ArgumentError.new("invalid value for boolean: #{value}")
     end
 
+
+    # convert a value (case insentitive) to a boolen value
+    # true, "true", "t", "yes", "y", "1" => true
+    # othwerwise, false
+    #
+    # @since v0.6.0-a5
+    def self.true?(value)
+      begin
+        return self.boolean(value)
+      rescue
+        return false
+      end
+    end
+
+    # sort by multiple fields and multilple directions for different data types
+    #
+    # data structure of items: hash in array [ {} ]
+    # this will return a sorted items by the keys with their specified ascending or descending order
+    #
+    # @since v0.6.0-a5
+    # @see https://stackoverflow.com/questions/28234803/ruby-sort-by-multiple-fields-and-multilple-directions-for-different-data-types
+    def self.multi_sort(items, order)
+      direction_multiplier = { asc: 1, desc: -1 }
+      items.sort do |this, that|
+        order.reduce(0) do |diff, order|
+          next diff if diff != 0 # this and that have differed at an earlier order entry
+          key, direction = order
+          # deal with nil cases
+          next  0 if this[key].nil? && that[key].nil?
+          next  1 if this[key].nil?
+          next -1 if that[key].nil?
+          # do the actual comparison
+          comparison = this[key] <=> that[key]
+          next comparison * direction_multiplier[direction]
+        end
+      end
+    end
+
     # find the extension lookup_path by its name from the provided settings
     def self.extension_lookup_path(settings, extension_name)
       @@logger.debug("settings: #{settings}")
@@ -45,7 +85,7 @@ module TeracyDev
     def self.load_yaml_file(file_path)
       if File.exist? file_path
         # TODO: exception handling
-        result = YAML.load(File.new(file_path))
+        result = YAML.load_file(file_path)
         if result == false
           @@logger.debug("#{file_path} is empty")
           result = {}
@@ -74,11 +114,11 @@ module TeracyDev
       return obj.reduce({}) do |memo, (k, v)|
         memo.tap { |m| m[k.to_sym] = symbolize(v) }
       end if obj.is_a? Hash
-        
-      return obj.reduce([]) do |memo, v| 
+
+      return obj.reduce([]) do |memo, v|
         memo << symbolize(v); memo
       end if obj.is_a? Array
-      
+
       obj
     end
 
@@ -118,9 +158,8 @@ module TeracyDev
     # We also support force override the array key with: "r" ("r" - replace) to completely replace the array key, this is useful when we want to replace the array completely
     # We also support update by adding more array elements by the key with "_ua_" prefix, this is useful for array objects without "_id_" key.
     # for example:
-    # "_r_synced_folders": []
-    # "_ua__ua_aliases": ["dev.teracy.com"]
-    # This will replace default "synced_folders" with an empty array "[]".
+    # "_r_synced_folders": [] # This will replace default "synced_folders" with an empty array "[]".
+    # "_ua_aliases": ["dev.teracy.com"] # This will update "aliases" by appending specified items.
     # "_" is reserved for teracy-dev to override the default config.
     # This is applied for objects within array only, for JSON object, just use its key to override.
     # see: https://github.com/teracyhq/dev/issues/239
@@ -134,9 +173,9 @@ module TeracyDev
         replaced_key = key.to_s.sub(/_u?[ra]_/, '')
 
         if !originHash.has_key?(replaced_key)
-         if value.class.name == 'Hash'
+          if value.class.name == 'Hash'
             originHash[key] = {}
-        elsif value.class.name == 'Array'
+          elsif value.class.name == 'Array'
             originHash[replaced_key] = []
           end
         end
@@ -177,11 +216,24 @@ module TeracyDev
                 id_existing = false
                 originHash[key] ||= []
                 originHash[key].each do |val1|
+
+                  if val1['_id_deprecated'] != nil && val['_id'] == val1['_id_deprecated']
+                    message = "The _id: '#{val1['_id_deprecated']}' is deprecated, use the _id: '#{val1['_id']}' instead for #{val}"
+                    unless @@deprecated_messages.include?(message)
+                      @@logger.warn(message)
+                      @@deprecated_messages << message
+                    end
+
+                    # val['_id'] should be updated to use val1['_id'] instead
+                    val['_id'] = val1['_id']
+                  end
+
                   if val1['_id'] == val['_id']
                     id_existing = true
                     break
                   end
                 end
+
                 if id_existing == false
                   if !val['_op'].nil? and val['_op'] != 'a'
                     # warnings
