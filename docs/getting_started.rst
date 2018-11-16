@@ -21,7 +21,7 @@ Please follow the installation instruction below, after that, the instruction st
 
       + macOS Sierra
       + Ubuntu 16.04
-      + Windows 10, Windows 8, Windows 7
+      + Windows 10, Windows 8, Windows 7 SP1 x64. We don't support Windows 32 bit.
 
       Other platforms are expected to work, but we haven't fully tested them yet.
 
@@ -333,6 +333,18 @@ teracy-dev Git Clone and Vagrant Up
          "VBoxDrv.inf" in your installation directory then re-install it to fix the issue. The VirtualBox
          has an installation issue which was reported `here <https://www.virtualbox.org/ticket/4140>`_
 
+       - On Windows, if you see the error `code converter not found (UTF-16LE to Windows-1258) (Encoding::ConverterNotFoundError)` when using vagrant:
+
+         ::
+
+           $ vagrant status
+           C:/HashiCorp/Vagrant/embedded/mingw64/lib/ruby/2.4.0/win32/registry.rb:185:in `encode!': code converter not found (UTF-16LE to Windows-1258) (Encoding::ConverterNotFoundError)
+
+         You should set the `system locale` into `US`, by following the steps below:
+         
+           - Open `Control Panel` --> `Region` --> `Location` --> select `United States` for `Home Location`.
+           - Navigate to the `Administrative` tab --> Change system locale… > Click `Appy` in the popup --> click `OK` to confirm selecting `English (United States)` --> Apply, and restart the machine.
+
 2. Use the ``$ vagrant ssh`` command to access the virtual machine you have just `vagrant up`.
 
    ..  code-block:: bash
@@ -363,5 +375,14 @@ https://help.github.com/articles/connecting-to-github-with-ssh/
    .. note::
 
       On Windows, you must always use ``Cygwin Terminal``, not ``Git Bash``.
+      If you have SSH configured and vagrant is still not working on Windows, set the
+      `VAGRANT_PREFER_SYSTEM_BIN` environment variable to true:
+
+      ..  code-block:: bash
+
+          $ export VAGRANT_PREFER_SYSTEM_BIN=true
+          $ vagrant status
+
+
 
 *Congratulations, you’ve all set now!*
