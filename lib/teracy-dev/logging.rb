@@ -1,15 +1,14 @@
 require 'logger'
 
 require_relative 'common'
-require_relative 'logging/progname_acceptor'
-require_relative 'logging/mask_filter'
+
 
 module TeracyDev
   module Logging
     # Use a hash class-ivar to cache a unique Logger per class:
     @@loggers = {}
-    @@acceptors = [PrognameAcceptor.new] # default acceptors
-    @@filters = [MaskFilter.new] # default filters
+    @@acceptors = []
+    @@filters = []
 
     def self.logger_for(classname)
       # cache
@@ -58,8 +57,14 @@ module TeracyDev
         end
 
         if accepted
-          @@filters.each do |filter|
-            msg = filter.filtered(msg)
+          @@filters.each do |flt|
+            if flt.respond_to?(:filtered)
+              deprecated_msg = "[TeracyDev::Logging][WARN]: filter.filtered is deprecated, use filter.filter instead for #{flt}"
+              puts TeracyDev::Common.yellow(deprecated_msg)
+              msg = flt.filtered(msg.to_s)
+            else
+              msg = flt.filter(msg.to_s)
+            end
           end
           log = "[#{progname}][#{severity}]: #{msg}\n"
           case severity
