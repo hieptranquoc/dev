@@ -33,6 +33,7 @@ module TeracyDev
       settings = build_settings().freeze
       require_vagrant_version(settings['vagrant']['require_version']) if TeracyDev::Util.exist?(settings['vagrant']['require_version'])
       require_teracy_dev_version(settings['teracy-dev']['require_version'])
+      TeracyDev::Plugin.sync(settings['vagrant']['plugins'])
       configure_vagrant(settings)
     end
 
@@ -145,7 +146,7 @@ module TeracyDev
         settings["nodes"][index] = Util.override(settings['default'], node)
       end
       if Util.true?(ENV['LOG_SETTINGS_YAML'])
-        @logger.debug("final settings: \n #{settings.to_yaml}")
+        @logger.info("final settings: \n #{settings.to_yaml}")
       else
         @logger.debug("final settings: #{settings}")
       end
