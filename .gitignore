@@ -134,6 +134,8 @@ Session.vim
 !.gitmodules
 !.chef
 !.travis
+!.rubocop.yml
+!.rubocop_todo.yml
 
 # docs
 _deploy
@@ -152,6 +154,8 @@ docs/_build/**
 
 extensions/*
 !extensions/.gitkeep
+
+!.dockerignore
 
 # Ignore workspace sub directories
 workspace/*

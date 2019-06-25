@@ -11,17 +11,15 @@ Please follow the installation instruction below, after that, the instruction st
 
 ..  note::
 
-    - The 64-bit architecture is used and run every day by us, however, the 32-bit architecture is
-      expected to work, too.
-
     - By default, we're using a Ubuntu 64-bit guest OS, so you need to enable VT-x/AMD-v in the host PC BIOS.
       Remember to reboot your host PC after making BIOS changes. Please refer to https://forums.virtualbox.org/viewtopic.php?f=1&t=62339 for more details.
 
     - We recommend the following tested and supported platforms:
 
-      + macOS Sierra
-      + Ubuntu 16.04
+      + macOS Sierra and above
+      + Ubuntu 16.04 and above
       + Windows 10, Windows 8, Windows 7 SP1 x64. We don't support Windows 32 bit.
+        Note: Power shell version >= 3.0
 
       Other platforms are expected to work, but we haven't fully tested them yet.
 
@@ -43,20 +41,20 @@ Manual Installation on macOS
 
 Open the terminal window:
 
-1. Install ``Homebrew`` and ``Homebrew Cask``
+1. Install ``Homebrew``
 
    - http://brew.sh/
-   - https://caskroom.github.io/
+
 
 2. Install ``virtualbox`` and ``vagrant``
 
-   - Install ``virtualbox``:
+   - Install ``virtualbox`` (>= v5.2.22):
 
      .. code-block:: bash
 
         $ brew cask install virtualbox
 
-   - Install ``vagrant``:
+   - Install ``vagrant`` (>= v2.2.0):
 
      .. code-block:: bash
 
@@ -65,7 +63,6 @@ Open the terminal window:
      ..  note::
 
          - If you encounter the following similar error:
-
            ..  code-block:: bash
 
               ==> default: Box 'bento/ubuntu-16.04' could not be found. Attempting to find and install...
@@ -108,20 +105,20 @@ Open the terminal window:
       $ sudo apt-get update
       $ sudo apt-get install -y git
 
-2. Install ``virtualbox``:
+2. Install ``virtualbox`` (>= v5.2.22):
 
    ..  code-block:: bash
 
-      $ sudo sh -c "echo 'deb http://download.virtualbox.org/virtualbox/debian '$(lsb_release -cs)' contrib non-free' > /etc/apt/sources.list.d/virtualbox.list" \
-      && wget -q http://download.virtualbox.org/virtualbox/debian/oracle_vbox_2016.asc -O- | sudo apt-key add - \
+      $ wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add - \
       && wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add - \
-      && sudo apt-get update && sudo apt-get install virtualbox-5.2 -y
+      && sudo add-apt-repository "deb http://download.virtualbox.org/virtualbox/debian `lsb_release -cs` contrib"
+      && sudo apt-get update && sudo apt-get install virtualbox-5.2 -y # or virtualbox-6.0
 
-3. Install ``vagrant``:
+3. Install ``vagrant`` (>= v2.2.0):
 
    ..  code-block:: bash
 
-      $ version=2.1.2 && cd /tmp \
+      $ version=2.2.3 && cd /tmp \
       && wget $(if [ `uname -m` == "x86_64" ]; then echo "https://releases.hashicorp.com/vagrant/$version/vagrant_${version}_x86_64.deb"; else echo "https://releases.hashicorp.com/vagrant/$version/vagrant_${version}_i686.deb"; fi;) \
       && sudo dpkg -i vagrant_${version}* && rm vagrant_${version}* && cd --
 
@@ -134,7 +131,7 @@ Please check out the instruction video below for more details:
 
   ..  note::
 
-      The video is not really up to date with current teracy-dev v0.5.0, however, you will see the similar workflow and result.
+      The video is not really up to date with current teracy-dev v0.6.0, however, you will see the similar workflow and result.
 
 Next: `teracy-dev Git Clone and Vagrant Up <teracy-dev-git-clone-and-vagrant-up_>`_
 
@@ -145,7 +142,7 @@ Automatic Installation on Windows
 
 .. _manual-installation-on-windows-to-use-git-bash:
 
-Manual Installation on Windows to use Git Bash
+Manual Installation on Windows to Use Git Bash
 ----------------------------------------------
 
 1. Install `chocolatey <https://chocolatey.org/install#installing-chocolatey>`_:
@@ -158,7 +155,7 @@ Manual Installation on Windows to use Git Bash
 
    After the installation is finished, restart the machine.
 
-2. Install `git <https://git-scm.com/downloads>`_ (>= 2.20.1):
+2. Install `git <https://git-scm.com/>`_:
 
    ..  code-block:: bash
 
@@ -170,11 +167,11 @@ Manual Installation on Windows to use Git Bash
 
        $ choco install virtualbox --version 5.2.22
 
-4. Install `vagrant <https://www.vagrantup.com/>`_ (>= 2.2.2):
+4. Install `vagrant <https://www.vagrantup.com/>`_ (>= 2.2.0):
 
    ..  code-block:: bash
 
-       $ choco install vagrant --version 2.2.2
+       $ choco install vagrant --version 2.2.3
 
 5. Install rsync for ```Git Bash```:
 
@@ -186,7 +183,7 @@ Now everything is done, head over to `teracy-dev Git Clone and Vagrant Up <terac
 
 .. _manual-installation-on-windows-to-use-cygwin:
 
-Manual Installation on Windows to use Cygwin
+Manual Installation on Windows to Use Cygwin
 --------------------------------------------
 
 This should be the same on Windows 10, Windows 8 and Windows 7.
@@ -202,7 +199,7 @@ Follow step by step instructions below:
 
 1. Install ``chocolatey``
 
-   Run ``Command Prompt`` **as administrator** and paste the Cmd.exe command copied from
+   Run ``Command Prompt`` **as administrator** and paste the Cmd.exe command copied from the
    https://chocolatey.org/install#install-with-cmdexe section.
 
    It should look similar to the following command:
@@ -280,17 +277,17 @@ Follow step by step instructions below:
 
         $ cyg-get.bat git
 
-   - Install ``virtualbox``:
+   - Install ``virtualbox`` (>= v5.2.22):
 
      .. code-block:: bash
 
-        $ choco install virtualbox --version 5.2.14 -y
+        $ choco install virtualbox --version 5.2.22 -y
 
-   - Install ``vagrant``:
+   - Install ``vagrant`` (>= v2.2.0):
 
      .. code-block:: bash
 
-        $ choco install vagrant --version 2.1.2 -y
+        $ choco install vagrant --version 2.2.3 -y
 
    After finishing the ``vagrant`` installation, restart the machine.
 
@@ -302,7 +299,7 @@ Please check out the instruction video below for more details:
 
   ..  note::
 
-      The video is not really up to date with current teracy-dev v0.5.0, however, you will see the similar workflow and result.
+      The video is not really up to date with current teracy-dev v0.6.0, however, you will see the similar workflow and result.
 
 
 Next: `teracy-dev Git Clone and Vagrant Up <teracy-dev-git-clone-and-vagrant-up_>`_
@@ -338,10 +335,10 @@ teracy-dev Git Clone and Vagrant Up
           node-01: SSH auth method: private key
           node-01: Warning: Remote connection disconnect. Retrying...
           node-01: Warning: Connection reset. Retrying...
-          node-01: 
+          node-01:
           node-01: Vagrant insecure key detected. Vagrant will automatically replace
           node-01: this with a newly generated keypair for better security.
-          node-01: 
+          node-01:
           node-01: Inserting generated public key within guest...
           node-01: Removing insecure key from the guest if it's present...
           node-01: Key inserted! Disconnecting and reconnecting using new SSH key...
@@ -379,7 +376,7 @@ teracy-dev Git Clone and Vagrant Up
            C:/HashiCorp/Vagrant/embedded/mingw64/lib/ruby/2.4.0/win32/registry.rb:185:in `encode!': code converter not found (UTF-16LE to Windows-1258) (Encoding::ConverterNotFoundError)
 
          You should set the `system locale` into `US`, by following the steps below:
-         
+
            - Open `Control Panel` --> `Region` --> `Location` --> select `United States` for `Home Location`.
            - Navigate to the `Administrative` tab --> Change system locale… > Click `Appy` in the popup --> click `OK` to confirm selecting `English (United States)` --> Apply, and restart the machine.
 
@@ -394,7 +391,7 @@ teracy-dev Git Clone and Vagrant Up
 
    .. code-block:: bash
 
-      Welcome to Ubuntu 16.04.4 LTS (GNU/Linux 4.4.0-116-generic x86_64)
+      Welcome to Ubuntu 18.04.4 LTS (GNU/Linux 4.4.0-116-generic x86_64)
 
        * Documentation:  https://help.ubuntu.com
        * Management:     https://landscape.canonical.com
